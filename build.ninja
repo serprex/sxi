@@ -1,0 +1,3 @@
+rule cc
+ command=gcc $in -Os -o $out
+build sxi:cc sxi.c
