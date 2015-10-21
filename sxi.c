@@ -21,19 +21,16 @@ int main(int argc, char **argv)
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGUSR1);
 	sigprocmask(SIG_BLOCK, &mask, &old);
-	pid_t serverpid = fork();
+	const pid_t serverpid = fork();
 	if (!serverpid) {
 		sigprocmask(SIG_SETMASK, &old, 0); // Unblock
 		signal(SIGTTIN, SIG_IGN);
 		signal(SIGTTOU, SIG_IGN);
 		signal(SIGUSR1, SIG_IGN);
 		setpgid(0,getpid());
-		char *xserverrc[4] = {"sh", 0, ":0", 0};
-		if (!(xserverrc[1] = getenv("XSERVERRC")) && home) {
-			xserverrc[1] = malloc(homelen+strlen("/.xserverrc")+1);
-			memcpy(xserverrc[1], home, homelen);
-			memcpy(xserverrc[1]+homelen, "/.xserverrc", strlen("/.xserverrc")+1);
-		}
+		char *xserverrc[4] = {"sh", malloc(homelen+strlen("/.xserverrc")+1), ":0", 0};
+		memcpy(xserverrc[1], home, homelen);
+		memcpy(xserverrc[1]+homelen, "/.xserverrc", strlen("/.xserverrc")+1);
 		execvp(xserverrc[1], xserverrc+1);
 		execvp("sh", xserverrc);
 		_exit(EXIT_FAILURE);
@@ -45,18 +42,15 @@ int main(int argc, char **argv)
 		alarm(0);
 		sigprocmask(SIG_SETMASK, &old, 0);
 	}
-	pid_t clientpid = fork();
+	const pid_t clientpid = fork();
 	if (!clientpid){
 		if (setenv("DISPLAY", ":0", true) == -1) fputs("cannot set DISPLAY", stderr);
 		else if (setuid(getuid()) == -1) fputs("cannot setuid", stderr);
 		else{
 			setpgid(0, getpid());
-			char *xinitrc[3] = {"sh", 0, 0};
-			if (!(xinitrc[1] = getenv("XINITRC")) && home) {
-				xinitrc[1] = malloc(homelen+strlen("/.xinitrc")+1);
-				memcpy(xinitrc[1], home, homelen);
-				memcpy(xinitrc[1]+homelen, "/.xinitrc", strlen("/.xinitrc")+1);
-			}
+			char *xinitrc[3] = {"sh", malloc(homelen+strlen("/.xinitrc")+1), 0};
+			memcpy(xinitrc[1], home, homelen);
+			memcpy(xinitrc[1]+homelen, "/.xinitrc", strlen("/.xinitrc")+1);
 			execvp(xinitrc[1], xinitrc+1);
 			execvp("sh", xinitrc);
 		}
