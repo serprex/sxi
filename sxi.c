@@ -13,13 +13,13 @@ int main(int argc, char **argv)
 	const int homelen = strlen(home);
 	char *const xrc[2] = {malloc(homelen+strlen("/.xserverrc")+1), 0};
 	memcpy(*xrc, home, homelen);
+	memcpy(*xrc+homelen, "/.xserverrc", strlen("/.xserverrc")+1);
 	const pid_t serverpid = fork();
 	if (!serverpid) {
 		signal(SIGTTIN, SIG_IGN);
 		signal(SIGTTOU, SIG_IGN);
 		signal(SIGUSR1, SIG_IGN);
 		setpgid(0,getpid());
-		memcpy(*xrc+homelen, "/.xserverrc", strlen("/.xserverrc")+1);
 		execvp(*xrc, xrc);
 		_exit(EXIT_FAILURE);
 	}
@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 		if (setuid(getuid()) == -1) fputs("cannot setuid", stderr);
 		else{
 			setpgid(0, getpid());
-			memcpy(*xrc+homelen, "/.xinitrc", strlen("/.xinitrc")+1);
+			memcpy(*xrc+homelen+3, "initrc", strlen("initrc")+1);
 			execvp(*xrc, xrc);
 		}
 		_exit(EXIT_FAILURE);
