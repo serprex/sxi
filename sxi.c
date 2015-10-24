@@ -9,15 +9,10 @@ int main(int argc, char **argv)
 	struct sigaction si = { .sa_handler = sigIgnore, .sa_flags = SA_RESTART };
 	sigemptyset(&si.sa_mask);
 	sigaction(SIGUSR1, &si, 0);
-	sigset_t mask, old;
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGUSR1);
-	sigprocmask(SIG_BLOCK, &mask, &old);
 	const char *const home = getenv("HOME");
 	const int homelen = strlen(home);
 	const pid_t serverpid = fork();
 	if (!serverpid) {
-		sigprocmask(SIG_SETMASK, &old, 0);
 		signal(SIGTTIN, SIG_IGN);
 		signal(SIGTTOU, SIG_IGN);
 		signal(SIGUSR1, SIG_IGN);
@@ -31,7 +26,6 @@ int main(int argc, char **argv)
 	}
 	if (serverpid>=0){
 		waitpid(serverpid, 0, WNOHANG);
-		sigprocmask(SIG_SETMASK, &old, 0);
 	}
 	const pid_t clientpid = fork();
 	if (!clientpid){
