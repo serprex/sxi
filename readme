@@ -1,0 +1,6 @@
+sxi //  || suckless xinit
+   //
+   \\  /|| only checks ~/.xinitrc ~/.xserverrc
+    \\//|| no argument parsing or setenv of DISPLAY or WINDOWPATH
+    //\\|| thus user must configure .xinitrc/.xserverrc accordingly
+   //  \|| .xserverrc: exec X -nolisten tcp vt1 :0
