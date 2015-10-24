@@ -18,11 +18,8 @@ int main(int argc, char **argv){
 	}else if (serverpid < 0) return fputs("server fork failed", stderr);
 	const pid_t clientpid = fork();
 	if (!clientpid){
-		if (setuid(getuid()) == -1) return fputs("cannot setuid", stderr);
-		else{
-			memcpy(*xrc+homelen+3, "initrc", strlen("initrc")+1);
-			return setpgid(0, getpid()) || execvp(*xrc, xrc);
-		}
+		memcpy(*xrc+homelen+3, "initrc", strlen("initrc")+1);
+		return setuid(getuid()) || setpgid(0, getpid()) || execvp(*xrc, xrc);
 	} else if (clientpid < 0) return fputs("client fork failed", stderr);
 	pid_t pid;
 	do pid = wait(0); while (pid != clientpid && pid != serverpid);
