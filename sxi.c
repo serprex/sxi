@@ -39,8 +39,7 @@ int main(int argc, char **argv)
 	}
 	const pid_t clientpid = fork();
 	if (!clientpid){
-		if (setenv("DISPLAY", ":0", 1) == -1) fputs("cannot set DISPLAY", stderr);
-		else if (setuid(getuid()) == -1) fputs("cannot setuid", stderr);
+		if (setuid(getuid()) == -1) fputs("cannot setuid", stderr);
 		else{
 			setpgid(0, getpid());
 			char *const xrc[3] = {"sh", malloc(homelen+strlen("/.xinitrc")+1), 0};
